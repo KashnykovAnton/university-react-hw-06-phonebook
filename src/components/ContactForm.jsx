@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'store/contactsSlice/contactsSlice';
+import { getContacts } from 'store/selectors';
 
-const ContactForm = ({ onSubmit }) => {
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+const ContactForm = () => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  const handleChange = (e) => {
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
+
+  const handleChange = e => {
     const { name, value } = e.target;
 
     switch (name) {
-      case "name":
+      case 'name':
         setName(value);
         break;
 
-      case "number":
+      case 'number':
         setNumber(value);
         break;
 
@@ -21,15 +27,23 @@ const ContactForm = ({ onSubmit }) => {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = e => {
     e.preventDefault();
-    onSubmit(name, number);
+    formSubmitHandler({ name, number, id: Math.floor(Math.random() * 100) });
     resetForm();
   };
 
+  const formSubmitHandler = contact => {
+    contacts.find(el => {
+      return el.name.toLowerCase() === contact.name.toLowerCase();
+    })
+      ? alert(`${contact.name} is already in contacts`)
+      : dispatch(addContact(contact));
+  };
+
   const resetForm = () => {
-    setName("");
-    setNumber("");
+    setName('');
+    setNumber('');
   };
 
   return (
@@ -37,7 +51,7 @@ const ContactForm = ({ onSubmit }) => {
       <label className="InputLabel">
         Name
         <input
-        className="Input"
+          className="Input"
           type="text"
           name="name"
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
@@ -51,7 +65,7 @@ const ContactForm = ({ onSubmit }) => {
       <label className="InputLabel">
         Number
         <input
-        className="Input"
+          className="Input"
           type="tel"
           name="number"
           pattern="\+?\d{1,4}?[-\.\s]?\(?\d{1,3}?\)?[-\.\s]?\d{1,4}[-\.\s]?\d{1,4}[-\.\s]?\d{1,9}"
